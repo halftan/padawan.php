@@ -5,6 +5,7 @@ namespace Padawan\Domain\Completer;
 use Padawan\Domain\Project;
 use Padawan\Domain\Completion\Context;
 use Padawan\Domain\Completion\Entry;
+use Psr\Log\LoggerInterface;
 
 class UseCompleter extends AbstractFileInfoCompleter
 {
@@ -14,11 +15,13 @@ class UseCompleter extends AbstractFileInfoCompleter
         $postfix = trim($context->getData());
         $index = $project->getIndex();
         $fqcns = array_merge($index->getClasses(), $index->getInterfaces());
+        $this->logger->debug('Use completer, postfix: ' . $postfix);
         foreach ($fqcns as $fqcn => $class) {
             if (!empty($postfix) && strpos($fqcn, $postfix) === false) {
                 continue;
             }
             $complete = str_replace($postfix, "", $fqcn);
+            $this->logger->debug('entry', ['name' => $complete, 'fqcn' => $fqcn]);
             $entries[] = new Entry(
                 $complete,
                 '',
@@ -35,11 +38,25 @@ class UseCompleter extends AbstractFileInfoCompleter
             }
             return $strlenDiff;
         });
+        if (count($entries) > 100) {
+            array_splice($entries, 100);
+        }
         return $entries;
     }
 
     public function canHandle(Project $project, Context $context)
     {
         return parent::canHandle($project, $context) && $context->isUse();
+    }
+
+    /**
+     * @var LoggerInterface $logger
+     */
+    private $logger;
+
+    public function __construct(
+        LoggerInterface $logger
+    ) {
+        $this->logger = $logger;
     }
 }

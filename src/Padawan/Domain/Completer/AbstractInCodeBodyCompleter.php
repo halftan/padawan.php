@@ -14,7 +14,6 @@ use Padawan\Domain\Scope\FunctionScope;
  */
 abstract class AbstractInCodeBodyCompleter implements CompleterInterface
 {
-
     public function canHandle(Project $project, Context $context)
     {
         $scope = $context->getScope();

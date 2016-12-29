@@ -7,6 +7,7 @@ use Padawan\Domain\Scope;
 use Padawan\Domain\Project;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Padawan\Domain\Event\CustomCompleterEvent;
+use Psr\Log\LoggerInterface;
 
 class CompleterFactory
 {
@@ -21,6 +22,7 @@ class CompleterFactory
         UseCompleter $useCompleter,
         VarCompleter $varCompleter,
         GlobalFunctionsCompleter $functionsCompleter,
+        LoggerInterface $logger,
         EventDispatcher $dispatcher
     ) {
         $this->completers = [
@@ -34,6 +36,8 @@ class CompleterFactory
             $functionsCompleter
         ];
         $this->dispatcher = $dispatcher;
+        $this->logger = $logger;
+        $this->logger->info('Factory initialized');
     }
 
     public function getCompleters(Project $project, Context $context)
@@ -54,4 +58,9 @@ class CompleterFactory
 
     private $completers;
     private $dispatcher;
+
+    /**
+     * @var LoggerInterface $logger
+     */
+    private $logger;
 }

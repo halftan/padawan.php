@@ -95,6 +95,29 @@ class InMemoryIndex implements Index
     }
 
     /**
+     * @return string[]
+     */
+    public function searchClassesByName($keyword, $scope = '', $l) {
+        $classNames = array_keys($this->classes);
+        if ($this->hasCoreIndex()) {
+            $classNames = array_merge(
+                $classNames,
+                array_keys(self::$coreIndex->getClasses())
+            );
+        }
+        $l->debug('Searching classes with kw: ' . $keyword . ' in scope: ' . $scope);
+        if (!empty($scope)) {
+            if ($scope[strlen($scope) - 1] !== '\\') {
+                $scope .= '\\';
+            }
+            $keyword = $scope . $keyword;
+        }
+        return array_filter($classNames, function($name) use ($keyword) {
+            return strpos($name, $keyword) === 0;
+        });
+    }
+
+    /**
      * @return InterfaceData
      */
     public function findInterfaceByFQCN(FQCN $fqcn) {
@@ -105,6 +128,12 @@ class InMemoryIndex implements Index
         if ($this->hasCoreIndex()) {
             return self::$coreIndex->findInterfaceByFQCN($fqcn);
         }
+    }
+
+    /**
+     * @return string[]
+     */
+    public function searchInterfacesByName($keyword, $scope = '') {
     }
 
     /**
