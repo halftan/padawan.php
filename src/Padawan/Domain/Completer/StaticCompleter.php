@@ -53,7 +53,7 @@ class StaticCompleter extends AbstractInCodeBodyCompleter
         }
         if ($class->properties !== null) {
             foreach ($class->properties->all($spec) as $property) {
-                $entries[$property->name] = $this->createEntryForProperty($property);
+                $entries['$' . $property->name] = $this->createEntryForProperty($property);
             }
         }
         if ($class->constants !== null) {
