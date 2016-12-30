@@ -21,7 +21,6 @@ class UseCompleter extends AbstractFileInfoCompleter
                 continue;
             }
             $complete = str_replace($postfix, "", $fqcn);
-            $this->logger->debug('entry', ['name' => $complete, 'fqcn' => $fqcn]);
             $entries[] = new Entry(
                 $complete,
                 '',
@@ -38,9 +37,6 @@ class UseCompleter extends AbstractFileInfoCompleter
             }
             return $strlenDiff;
         });
-        if (count($entries) > 100) {
-            array_splice($entries, 100);
-        }
         return $entries;
     }
 

@@ -86,7 +86,6 @@ class ClassNameCompleter extends AbstractInCodeBodyCompleter
         $entries = [];
         foreach ($candidates as $name => $fqcnString) {
             $complete = str_replace($prefix, '', $name);
-            $this->logger->debug('entry', ['name' => $complete, 'fqcn' => $fqcnString]);
             $entries[] = new Entry(
                 $complete, '', '', $complete
             );

@@ -45,6 +45,8 @@ class CompleteCommand extends AsyncCommand
         $line = $input->getArgument("line");
         $content = $input->getArgument("data");
         $path = $input->getArgument("path");
+        /** @var $logger \Psr\Log\LoggerInterface */
+        $logger = $this->getContainer()->get(\Psr\Log\LoggerInterface::class);
 
         $projectRepository = $this->getContainer()->get(ProjectRepository::class);
         $project = $projectRepository->findByPath($path);
@@ -52,6 +54,12 @@ class CompleteCommand extends AsyncCommand
         $completeEngine = $this->getContainer()->get(CompleteEngine::class);
         /** @var Persister */
         $persister = $this->getContainer()->get(Persister::class);
+
+        $logger->debug('Start completion', [
+            'line'   => $line,
+            'column' => $column,
+            'file'   => $file,
+        ]);
         try {
             $completion = $completeEngine->createCompletion(
                 $project,
