@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 
 class ClassNameCompleter extends AbstractInCodeBodyCompleter
 {
-    public function getEntries(Project $project, Context $context) {
+    public function getEntries(Project $project, Context $context, $cursorLine = 0) {
         $entries = [];
         $postfix = $this->getPostfix($context);
         $candidates = [];

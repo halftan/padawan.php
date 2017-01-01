@@ -9,7 +9,7 @@ use Psr\Log\LoggerInterface;
 
 class UseCompleter extends AbstractFileInfoCompleter
 {
-    public function getEntries(Project $project, Context $context)
+    public function getEntries(Project $project, Context $context, $cursorLine = 0)
     {
         $entries = [];
         $postfix = trim($context->getData());

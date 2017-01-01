@@ -104,8 +104,8 @@ abstract class AbstractScope implements Scope
             return [];
         }
         $result = array_filter($this->typeHints, function($th) use ($startLine) {
-            /** @var $th TypeHint */
-            return $th->startLine <= $startLine;
+            /** @var $th Variable */
+            return $th->getStartLine() <= $startLine;
         });
         $returnVal = [];
         foreach ($result as $th) {
