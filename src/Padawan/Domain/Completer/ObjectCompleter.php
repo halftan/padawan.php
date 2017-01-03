@@ -59,6 +59,7 @@ class ObjectCompleter extends AbstractInCodeBodyCompleter
                 $entries[$property->name] = $this->createEntryForProperty($property);
             }
         }
+        ksort($entries);
         return $entries;
     }
 

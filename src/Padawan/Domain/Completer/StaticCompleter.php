@@ -60,6 +60,7 @@ class StaticCompleter extends AbstractInCodeBodyCompleter
                 $entries[$const] = $this->createEntryForConst($const);
             }
         }
+        ksort($entries, SORT_NATURAL);
         return $entries;
     }
 
