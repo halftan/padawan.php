@@ -14,9 +14,12 @@ use Psr\Log\LoggerInterface;
 
 class StaticCompleter extends AbstractInCodeBodyCompleter
 {
-    public function __construct(LoggerInterface $logger)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        ObjectCompleter $objectCompleter
+    ) {
         $this->logger = $logger;
+        $this->objectCompleter = $objectCompleter;
     }
     public function getEntries(Project $project, Context $context)
     {
@@ -24,6 +27,12 @@ class StaticCompleter extends AbstractInCodeBodyCompleter
         /** @var \PhpParser\Node\Name $workingNode */
         list($fqcn, $isThis, $_, $workingNode) = $context->getData();
         $workingNode = $workingNode->getLast();
+
+        if ($workingNode == 'parent') {
+            // parent instance method completion
+            return $this->objectCompleter->getEntries($project, $context);
+        }
+
         $isThis = $workingNode == 'self' || $workingNode == 'static';
 
         $this->logger->debug('creating static entries for type ' . $fqcn->toString());
@@ -100,4 +109,6 @@ class StaticCompleter extends AbstractInCodeBodyCompleter
 
     /** @property LoggerInterface */
     private $logger;
+    /** @property ObjectCompleter */
+    private $objectCompleter;
 }
