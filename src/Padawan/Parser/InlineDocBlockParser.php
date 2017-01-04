@@ -4,6 +4,7 @@ namespace Padawan\Parser;
 
 use Padawan\Domain\Project\Node\Variable;
 use Padawan\Domain\Project\Node\Comment;
+use PhpParser\Node;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\Closure;
 use PhpParser\Node\Stmt\Foreach_;
@@ -30,23 +31,34 @@ class InlineDocBlockParser {
      *
      * @return Variable[]
      */
-    public function parse($node)
+    public function parse(Node $node)
     {
         $result = [];
+        $nodes  = [];
+        $subNodes = $node->getSubNodeNames();
 
-        if (empty($node->stmts)) {
+        foreach ($subNodes as $nodeName) {
+            if ($node->$nodeName instanceof Node) {
+                $nodes[] = $node->$nodeName;
+            } else if (is_array($node->$nodeName)) {
+                $nodes = array_merge($nodes,
+                    array_filter($node->$nodeName, function($item) {
+                        return $item instanceof Node;
+                    })
+                );
+            }
+        }
+        if (empty($nodes)) {
             return $result;
         }
-        foreach ($node->stmts AS $stmt) {
-            if (!empty($stmt->stmts)) {
-                $result = array_merge($result, $this->parse($stmt));
-            }
+        foreach ($nodes AS $stmt) {
+            $result = array_merge($result, $this->parse($stmt));
             $comments = $stmt->getAttribute('comments');
             if (empty($comments)) {
                 continue;
             }
-            foreach ($comments as $comment) {
-                $text = trim($comment->getText());
+            foreach ($comments as $rawComment) {
+                $text = trim($rawComment->getText());
                 if (!empty($text)) {
                     if (strpos($text, '/**') !== 0) {
                         // only parse phpdoc
@@ -58,15 +70,7 @@ class InlineDocBlockParser {
                          * @var $variable Variable
                          * @var $stmt \PhpParser\NodeAbstract
                          */
-                        $line = $stmt->getLine();
-                        if ($line < 0) {
-                            // comments at the end of scope, like
-                            // function test() {
-                            //     ....
-                            //     /** end of func */  <- processing this line
-                            //  }
-                            continue;
-                        }
+                        $line = $rawComment->getLine();
                         if ($line > 1) {
                             // make up line difference between parsers
                             $line -= 2;

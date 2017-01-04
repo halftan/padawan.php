@@ -25,6 +25,7 @@ use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Expr\Closure;
+use Padawan\Parser\InlineDocBlockParser;
 
 class ScopeWalker extends NodeVisitorAbstract implements WalkerInterface
 {
@@ -32,12 +33,14 @@ class ScopeWalker extends NodeVisitorAbstract implements WalkerInterface
         UseParser $useParser,
         NodeTypeResolver $typeResolver,
         CommentParser $commentParser,
-        ParamParser $paramParser
+        ParamParser $paramParser,
+        InlineDocBlockParser $inlineDocBlockParser
     ) {
-        $this->useParser        = $useParser;
-        $this->typeResolver     = $typeResolver;
-        $this->commentParser    = $commentParser;
-        $this->paramParser      = $paramParser;
+        $this->useParser            = $useParser;
+        $this->typeResolver         = $typeResolver;
+        $this->commentParser        = $commentParser;
+        $this->paramParser          = $paramParser;
+        $this->inlineDocBlockParser = $inlineDocBlockParser;
     }
     public function setLine($line)
     {
@@ -132,6 +135,10 @@ class ScopeWalker extends NodeVisitorAbstract implements WalkerInterface
                     $var
                 );
             }
+        }
+        $variables = $this->inlineDocBlockParser->parse($node);
+        foreach ($variables as $variable) {
+            $this->scope->addVar($variable);
         }
     }
     public function createScopeFromMethod(ClassMethod $node)
