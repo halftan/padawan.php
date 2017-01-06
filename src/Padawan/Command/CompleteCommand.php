@@ -47,12 +47,6 @@ class CompleteCommand extends AsyncCommand
         $line = $input->getArgument("line");
         $content = $input->getArgument("data");
         $path = $input->getArgument("path");
-        $logger->debug('Starting complete command', [
-            'column' => $column,
-            'fild' => $file,
-            'line' => $line,
-            'path' => $path,
-        ]);
 
         $projectRepository = $this->getContainer()->get(ProjectRepository::class);
         $project = $projectRepository->findByPath($path);
@@ -65,6 +59,7 @@ class CompleteCommand extends AsyncCommand
             'line'   => $line,
             'column' => $column,
             'file'   => $file,
+            'path'   => $path
         ]);
         try {
             $completion = $completeEngine->createCompletion(
