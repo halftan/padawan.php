@@ -21,6 +21,7 @@ use PhpParser\NodeVisitorAbstract;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Variable as NodeVar;
 use PhpParser\Node\Expr\Assign;
+use PhpParser\Node\Expr\List_;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -161,9 +162,28 @@ class ScopeWalker extends NodeVisitorAbstract implements WalkerInterface
     }
     public function addVarToScope(Assign $node)
     {
+        if ($node->var instanceof List_) {
+            // expressions like:
+            //   list($var1, $var2) = xxx
+            foreach ($node->var->items as $item) {
+                /** @var $item \PhpParser\Node\Expr\ArrayItem */
+                if (empty($item->value) || !$item->value instanceof NodeVar) {
+                    // not variable
+                    continue;
+                }
+                $var = new Variable($item->value->name);
+                $var->setStartLine($item->value->getLine());
+                $this->scope->addVar($var);
+            }
+
+            return;
+        }
+
         if (!$node->var instanceof NodeVar) {
             return;
         }
+
+        // normal variable assignment
         $var = new Variable($node->var->name);
         $comment = $this->commentParser->parse($node->getAttribute('comments'));
         if ($comment->getVar($var->getName())) {
