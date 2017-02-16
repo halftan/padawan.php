@@ -45,6 +45,9 @@ class ObjectCompleter extends AbstractInCodeBodyCompleter
             // $workingNode is Variable
             /** @var $workingNode \PhpParser\Node\Expr\Variable */
             $name = $workingNode->getAttribute('name', '');
+            if (empty($name)) {
+                $name = (string) @$workingNode->name;
+            }
             $this->logger->debug('looking for type of variable: ' . $name);
             $var = $context->getScope()->getVar($name);
             if (empty($var)) {

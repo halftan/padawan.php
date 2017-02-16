@@ -137,8 +137,10 @@ class CompleteEngine
         $parser->addWalker($this->indexGeneratingWalker);
         $parser->setIndex($project->getIndex());
         $fileScope = $parser->parseContent($filePath, $content);
+        $reparse = false;
         if (empty($fileScope)) {
             // use cache when parsing failed
+            $reparse = true;
             $content = '';
             $this->logger->info('Parsing failed, use cache instead');
             if (!empty($this->cachePool[$filePath])) {
@@ -148,16 +150,17 @@ class CompleteEngine
         // Always parse file content to find current scope
         // use last succesfully parsed file content if possible
         if (empty($content)) {
+            $reparse = true;
             $fullPath = realpath($project->getRootFolder() . DIRECTORY_SEPARATOR . $file->path());
             $this->logger->info('Reparsing file ' . $fullPath);
             $content = file_get_contents($fullPath);
-        } else {
-            $this->logger->info('Reparsing cached file content');
         }
-        $parser->clearWalkers();
-        $parser->addWalker($this->indexGeneratingWalker);
-        $parser->setIndex($project->getIndex());
-        $fileScope = $parser->parseContent($filePath, $content);
+        if ($reparse) {
+            $parser->clearWalkers();
+            $parser->addWalker($this->indexGeneratingWalker);
+            $parser->setIndex($project->getIndex());
+            $fileScope = $parser->parseContent($filePath, $content);
+        }
         $this->generator->processFileScope(
             $file,
             $project->getIndex(),

@@ -13,6 +13,7 @@ class ClassNameCompleter extends AbstractInCodeBodyCompleter
     public function getEntries(Project $project, Context $context) {
         $entries = [];
         $postfix = $this->getPostfix($context);
+        $this->logger->debug('Completing word: ' . $postfix);
         $candidates = [];
         $fqcns = $context->getScope()->getUses()->searchByPrefix($postfix);
         $candidates = array_map(function(FQN $fqcn) {
