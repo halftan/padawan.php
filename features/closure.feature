@@ -60,3 +60,26 @@ Feature: Completion in closure
             | test1     | Test1     |
             | test2     | Test2     |
             | test3     |           |
+
+    Scenario: Getting object completion in closure uses
+        Given there is a file with:
+        """
+        <?php
+        class Test {
+            public function testMethod() {
+                return 1;
+            }
+        }
+
+        $test1 = new Test();
+        $test2 = new Test2();
+        $test3 = [1,2,3,4];
+        $a = function (Argument1 $arg1, Argument2 $arg2) use ($test1, $test2, &$test3) {
+
+        };
+        """
+        When I type "$test1->" on the 12 line
+        And I ask for completion
+        Then I should get:
+            | Name       | Signature  |
+            | testMethod | () : mixed |
