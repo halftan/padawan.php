@@ -43,7 +43,8 @@ class ConstantCompleter extends AbstractInCodeBodyCompleter
     {
         $entries = [];
         foreach ($candidates as $name) {
-            $complete = str_replace($postfix, '', $name);
+            $pattern = preg_quote($postfix, '#');
+            $complete = preg_replace("#$pattern#", '', $name, 1);
             $entries[] = new Entry(
                 $complete, '', '', $name
             );

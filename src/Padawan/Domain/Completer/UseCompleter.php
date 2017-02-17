@@ -20,7 +20,8 @@ class UseCompleter extends AbstractFileInfoCompleter
             if (!empty($postfix) && strpos($fqcn, $postfix) === false) {
                 continue;
             }
-            $complete = str_replace($postfix, "", $fqcn);
+            $pattern = preg_quote($postfix, '#');
+            $complete = preg_replace("#$pattern#", "", $fqcn, 1);
             $entries[] = new Entry(
                 $complete,
                 '',

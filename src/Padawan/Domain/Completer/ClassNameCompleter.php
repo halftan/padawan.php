@@ -64,12 +64,14 @@ class ClassNameCompleter extends AbstractInCodeBodyCompleter
         $prefix = ltrim($prefix, '\\');
         foreach ($candidates as $fqcnString) {
             if (!empty($search)) {
-                $menu = str_replace($search, '', $fqcnString);
+                $pattern = preg_quote($search, '#');
+                $menu = preg_replace("#$pattern#", '', $fqcnString, 1);
             } else {
                 $menu = $fqcnString;
             }
             if (strpos($menu, $prefix) === 0) {
-                $complete = str_replace($prefix, '', $menu);
+                $pattern = preg_quote("$prefix", '#');
+                $complete = preg_replace("#$pattern#", '', $menu, 1);
             } else {
                 $complete = $menu;
             }
@@ -84,7 +86,8 @@ class ClassNameCompleter extends AbstractInCodeBodyCompleter
     {
         $entries = [];
         foreach ($candidates as $name => $fqcnString) {
-            $complete = str_replace($prefix, '', $name);
+            $pattern = preg_quote($prefix, '#');
+            $complete = preg_replace("#$pattern#", '', $name, 1);
             $entries[] = new Entry(
                 $complete, '', '', $name
             );

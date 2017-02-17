@@ -17,7 +17,8 @@ class NamespaceCompleter extends AbstractFileInfoCompleter
             if (!empty($postfix) && strpos($namespace, $postfix) === false) {
                 continue;
             }
-            $complete = str_replace($postfix, "", $namespace);
+            $pattern = preg_quote($postfix, '#');
+            $complete = preg_replace("#$pattern#", "", $namespace, 1);
             $entries[$namespace] = new Entry($complete, "", "", $namespace);
         }
         $entries = array_values($entries);

@@ -30,7 +30,8 @@ class GlobalFunctionsCompleter extends AbstractInCodeBodyCompleter
             if (!empty($postfix) && strpos($name, $postfix) !== 0) {
                 continue;
             }
-            $nameToComplete = str_replace($postfix, "", $name);
+            $pattern = preg_quote($postfix, '#');
+            $nameToComplete = preg_replace("#$pattern#", "", $name, 1);
             $entries[$name] = new Entry(
                 $nameToComplete,
                 $function->getSignature(),

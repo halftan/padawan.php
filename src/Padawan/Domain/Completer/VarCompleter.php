@@ -35,8 +35,9 @@ class VarCompleter extends AbstractInCodeBodyCompleter
     {
         $type = $var->getType() instanceof FQCN ?
             $var->getType()->toString() : $var->getType();
+        $pattern = preg_quote($this->prefix, '#');
         return new Entry(
-            str_replace($this->prefix, '', $var->getName()),
+            preg_replace("#$pattern#", '', $var->getName(), 1),
             $type, '', $var->getName()
         );
     }
