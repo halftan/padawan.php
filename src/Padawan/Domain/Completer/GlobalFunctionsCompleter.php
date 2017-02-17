@@ -47,8 +47,13 @@ class GlobalFunctionsCompleter extends AbstractInCodeBodyCompleter
     {
         $postfix = $this->getPostfix($context);
         return parent::canHandle($project, $context)
-            && ($context->isString() || $context->isEmpty())
+            && (
+                $context->isString()
+                || $context->isEmpty()
+                || $context->isMethodCall()
+            )
             && strlen($postfix) > 0
+            && !$context->isObject()
             ;
     }
 
