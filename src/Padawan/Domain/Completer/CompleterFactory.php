@@ -22,6 +22,7 @@ class CompleterFactory
         UseCompleter $useCompleter,
         VarCompleter $varCompleter,
         GlobalFunctionsCompleter $functionsCompleter,
+        ConstantCompleter $constantCompleter,
         LoggerInterface $logger,
         EventDispatcher $dispatcher
     ) {
@@ -33,7 +34,8 @@ class CompleterFactory
             $staticCompleter,
             $useCompleter,
             $varCompleter,
-            $functionsCompleter
+            $functionsCompleter,
+            $constantCompleter,
         ];
         $this->dispatcher = $dispatcher;
         $this->logger = $logger;

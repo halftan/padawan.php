@@ -4,6 +4,7 @@ namespace Padawan\Framework\Domain\Project;
 
 use Padawan\Domain\Project\File;
 use Padawan\Domain\Project\FQCN;
+use Padawan\Domain\Project\FQN;
 use Padawan\Domain\Project\Index;
 use Padawan\Domain\Project\Node\ClassData;
 use Padawan\Domain\Project\Node\FunctionData;
@@ -12,13 +13,14 @@ use Padawan\Domain\Project\Node\InterfaceData;
 
 class InMemoryIndex implements Index
 {
-    private $files              = [];
-    private $fqcns              = [];
-    private $classes            = [];
-    private $interfaces         = [];
-    private $extends            = [];
-    private $implements         = [];
-    private $functions          = [];
+    private $files      = [];
+    private $fqcns      = [];
+    private $classes    = [];
+    private $interfaces = [];
+    private $extends    = [];
+    private $implements = [];
+    private $functions  = [];
+    private $constants  = [];
 
     /** @var Index $coreIndex */
     private static $coreIndex;
@@ -144,6 +146,12 @@ class InMemoryIndex implements Index
         return $this->implements[$interface->toString()];
     }
 
+    public function findConstantsInNamespace(FQN $fqn)
+    {
+        $fqn = $fqn->toString();
+        return (array) @$this->getConstants()[$fqn];
+    }
+
     /**
      * @return ClassData[]
      */
@@ -180,6 +188,15 @@ class InMemoryIndex implements Index
         return $functions;
     }
 
+    public function getConstants()
+    {
+        $constants = $this->constants;
+        if ($this->hasCoreIndex()) {
+            $constants = array_merge_recursive($constants, self::$coreIndex->getConstants());
+        }
+        return $constants;
+    }
+
     public function addClass(ClassData $class) {
         $this->classes[$class->fqcn->toString()] = $class;
         if ($class->getParent() instanceof FQCN) {
@@ -214,6 +231,13 @@ class InMemoryIndex implements Index
 
     public function addFQCN(FQCN $fqcn) {
         $this->fqcns[$fqcn->toString()] = $fqcn;
+    }
+
+    public function addConstant(FQN $fqn, $name)
+    {
+        $fqn = $fqn->toString();
+        $this->constants[$fqn][] = $name;
+        $this->constants[$fqn] = array_unique($this->constants[$fqn]);
     }
 
     protected function addExtend(ClassData $class, FQCN $parent) {

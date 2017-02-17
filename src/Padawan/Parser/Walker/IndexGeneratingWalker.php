@@ -24,7 +24,11 @@ use PhpParser\Node\Stmt\Function_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Use_;
+use PhpParser\Node\Const_ as ConstNode;
+use PhpParser\Node\Stmt\Const_ as ConstStmt;;
 use PhpParser\Node\Expr\Assign;
+use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Name;
 
 class IndexGeneratingWalker extends NodeVisitorAbstract implements WalkerInterface
 {
@@ -89,6 +93,19 @@ class IndexGeneratingWalker extends NodeVisitorAbstract implements WalkerInterfa
         } elseif ($node instanceof Use_) {
             $this->useTransformer->parse($node);
             return null;
+        } elseif ($node instanceof ConstNode) {
+            $namespace = $this->fileScope->getNamespace();
+            $this->index->addConstant($namespace, $node->name);
+            return null;
+        } elseif ($node instanceof ConstStmt) {
+            // do nothing, continue traversing children nodes
+            return null;
+        } elseif ($node instanceof FuncCall
+            && $node->name instanceof Name
+            && $node->name->toString() === 'define'
+        ) {
+            $constName = $node->args[0]->value->value;
+            $this->index->addConstant(new FQN(), $constName);
         }
         return NodeTraverser::DONT_TRAVERSE_CHILDREN;
     }
