@@ -64,9 +64,15 @@ class GlobalFunctionsCompleter extends AbstractInCodeBodyCompleter
         }
         if (empty($postfix)) {
             $contextData = $context->getData();
-            if (is_array($contextData) && @$contextData[3] instanceof \PhpParser\Node\Arg) {
-                if ($contextData[3]->value instanceof \PhpParser\Node\Expr\ConstFetch) {
-                    $postfix = $contextData[3]->value->name;
+            if (is_array($contextData) && @$contextData[3] instanceof \PhpParser\Node) {
+                $node = $contextData[3];
+                if (!empty($node->name)) {
+                    $postfix = $node->name;
+                    $context->addType(Context::T_ANY_NAME);
+                    return trim($postfix);
+                }
+                if (!empty($node->value) && $node->value instanceof \PhpParser\Node\Expr\ConstFetch) {
+                    $postfix = $node->value->name;
                     $context->addType(Context::T_ANY_NAME);
                     return trim($postfix);
                 }

@@ -18,8 +18,14 @@ class Token
         switch ($code) {
         case T_WHITESPACE:
             $this->addType(self::T_WHITESPACE);
+            // $this->removeType(self::T_CONTINUE_PROCESS);
+            // break;
         case T_NS_SEPARATOR:
             $this->addType(self::T_CONTINUE_PROCESS);
+            break;
+        case T_RETURN:
+            $this->removeType(self::T_CONTINUE_PROCESS);
+            $this->addType(self::T_TERMINATE);
             break;
         case T_STRING:
             $this->addType(self::T_STRING);

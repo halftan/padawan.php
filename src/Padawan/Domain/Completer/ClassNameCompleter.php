@@ -15,10 +15,14 @@ class ClassNameCompleter extends AbstractInCodeBodyCompleter
         $postfix = $this->getPostfix($context);
         $this->logger->debug('Completing word: ' . $postfix);
         $candidates = [];
-        $fqcns = $context->getScope()->getUses()->searchByPrefix($postfix);
-        $candidates = array_map(function(FQN $fqcn) {
-            return $fqcn->toString();
-        }, $fqcns);
+        $uses = $context->getScope()->getUses();
+        $candidates = [];
+        if (!empty($uses)) {
+            $fqcns = $uses->searchByPrefix($postfix);
+            $candidates = array_map(function(FQN $fqcn) {
+                return $fqcn->toString();
+            }, $fqcns);
+        }
         $scope = $context->getScope()->getNamespace();
 
         if ($postfix[0] === '\\') {

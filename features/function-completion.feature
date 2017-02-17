@@ -32,3 +32,33 @@ Feature: Function Completion
             | Menu |
             | array_pop_custom |
             | array_pop |
+
+    Scenario: Getting function completion in return statement
+        Given there is a file with:
+        """
+        <?php
+
+        """
+        When I type "return array_p" on the 2 line
+        And I ask for completion
+        Then I should get:
+            | Menu          |
+            | array_push    |
+            | array_pop     |
+            | array_pad     |
+            | array_product |
+
+    Scenario: Getting function completion in parentheses
+        Given there is a file with:
+        """
+        <?php
+
+        """
+        When I type "(array_p" on the 2 line
+        And I ask for completion
+        Then I should get:
+            | Menu          |
+            | array_push    |
+            | array_pop     |
+            | array_pad     |
+            | array_product |
