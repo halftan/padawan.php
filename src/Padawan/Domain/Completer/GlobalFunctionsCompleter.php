@@ -24,20 +24,22 @@ class GlobalFunctionsCompleter extends AbstractInCodeBodyCompleter
     {
         $entries = [];
         $postfix = $this->getPostfix($context);
+        if (empty($postfix)) {
+            return [];
+        }
+        $pattern = preg_quote($postfix, '#');
         foreach ($project->getIndex()->getFunctions() as $function) {
             /** @var FunctionData $function */
             $name = $function->name;
-            if (!empty($postfix) && strpos($name, $postfix) !== 0) {
-                continue;
+            if (strpos($name, $postfix) === 0) {
+                $nameToComplete = preg_replace("#$pattern#", "", $name, 1);
+                $entries[$name] = new Entry(
+                    $nameToComplete,
+                    $function->getSignature(),
+                    $function->doc,
+                    $name
+                );
             }
-            $pattern = preg_quote($postfix, '#');
-            $nameToComplete = preg_replace("#$pattern#", "", $name, 1);
-            $entries[$name] = new Entry(
-                $nameToComplete,
-                $function->getSignature(),
-                $function->doc,
-                $name
-            );
         }
         $entries = array_values($entries);
         return $entries;
