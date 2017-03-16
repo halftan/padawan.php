@@ -26,16 +26,18 @@ class StaticCompleter extends AbstractInCodeBodyCompleter
         /** @var FQCN $fqcn */
         /** @var \PhpParser\Node\Name $workingNode */
         list($fqcn, $isThis, $_, $workingNode) = $context->getData();
-        $workingNode = $workingNode->getLast();
+        if ($this->objectMode === false) {
+            $workingNode = $workingNode->getLast();
+        }
 
         if ($workingNode == 'parent') {
             // parent instance method completion
             return $this->objectCompleter->getEntries($project, $context);
         }
 
-        $isThis = $workingNode == 'self' || $workingNode == 'static';
+        $isThis = $isThis || $workingNode == 'self' || $workingNode == 'static';
 
-        $this->logger->debug('creating static entries for type ' . $fqcn->toString());
+        $this->logger->debug('creating static entries for type ' . $fqcn);
 
         if (!$fqcn instanceof FQCN) {
             return [];
@@ -75,7 +77,11 @@ class StaticCompleter extends AbstractInCodeBodyCompleter
 
     public function canHandle(Project $project, Context $context)
     {
-        return parent::canHandle($project, $context) && $context->isClassStatic();
+        if ($context->isThis() || $context->isObject()) {
+            $this->objectMode = true;
+        }
+        return parent::canHandle($project, $context) &&
+            ($context->isClassStatic() || $this->objectMode);
     }
 
     /**
@@ -111,4 +117,6 @@ class StaticCompleter extends AbstractInCodeBodyCompleter
     private $logger;
     /** @property ObjectCompleter */
     private $objectCompleter;
+    /** @property bool */
+    private $objectMode = false;
 }

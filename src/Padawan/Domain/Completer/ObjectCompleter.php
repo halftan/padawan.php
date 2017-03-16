@@ -87,6 +87,7 @@ class ObjectCompleter extends AbstractInCodeBodyCompleter
         }
         $this->logger->debug('Creating completion for ' . $class->getName());
         $entries = [];
+        // find instance methods
         $spec = new Specification($isThis ? 'private' : 'public');
         if ($class->methods !== null) {
             foreach ($class->methods->all($spec) as $method) {

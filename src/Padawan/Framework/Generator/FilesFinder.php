@@ -35,7 +35,7 @@ class FilesFinder implements FilesFinderInterface
             if (!preg_match('/\.php$/', $file)) {
                 continue;
             }
-            if (preg_match('#/[tT]ests?/#', $file)) {
+            if (preg_match('#/vendor/.*/[tT]ests?/#', $file)) {
                 // exclude test files
                 continue;
             }
