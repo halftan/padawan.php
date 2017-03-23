@@ -54,6 +54,7 @@ class NodeTypeResolver
             || $node instanceof StaticPropertyFetch
             || $node instanceof MethodCall
             || $node instanceof StaticCall
+            || $node instanceof FuncCall
         ) {
             return $this->getLastChainNodeType($node, $index, $scope);
         } elseif ($node instanceof New_ && $node->class instanceof Name) {
