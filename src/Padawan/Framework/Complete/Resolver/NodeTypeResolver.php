@@ -133,11 +133,13 @@ class NodeTypeResolver
                 }
             } elseif ($block->getType() === 'function') {
                 $name = $block->getName();
-                $function = $index->findFunctionByName($name->toString());
-                if (empty($function)) {
-                    $type = null;
-                } else {
-                    $type = $function->return;
+                if ($name instanceof Name) {
+                    $function = $index->findFunctionByName($name->toString());
+                    if (empty($function)) {
+                        $type = null;
+                    } else {
+                        $type = $function->return;
+                    }
                 }
             }
             $event = new TypeResolveEvent($block, $type);
